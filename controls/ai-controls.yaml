@@ -1,0 +1,152 @@
+# ai-controls.yaml — source-of-truth AI control catalog (synthetic)
+# -----------------------------------------------------------------------------
+# AI-specific controls for an AI Management System (AIMS) built to
+# ISO/IEC 42001:2023, crosswalked to the NIST AI Risk Management Framework
+# and (where they intersect) ISO/IEC 27001 and ISO/IEC 23894.
+#
+# Each control is defined ONCE and tagged to an AI lifecycle stage, so an
+# auditor can see WHERE in the model lifecycle the control applies — not just
+# "the AI" in the abstract.
+#
+# Schema (enforced by scripts/validate_ai_controls.py):
+#   id                 : stable identifier (required, unique)
+#   title              : human-readable name (required)
+#   statement          : what the control requires (required)
+#   ai_lifecycle_stage : >=1 of {data, development, validation, deployment,
+#                        operation, retirement} (required)
+#   maps_to            : >=1 framework with >=1 reference (required)
+#   evidence           : >=1 item, each with source + artifact + cadence (required)
+#
+# NOTE: All content is synthetic and illustrative. No organization's real AI
+# system, model, or control implementation is represented.
+# -----------------------------------------------------------------------------
+
+controls:
+
+  - id: AIMS-GOV-1
+    title: AI Policy and Accountability
+    statement: >
+      A documented AI policy defines acceptable use, roles, and accountability
+      for AI systems, approved by leadership and reviewed on a defined cycle.
+      Accountable owners are named for each AI system in scope.
+    ai_lifecycle_stage: [development, deployment, operation]
+    maps_to:
+      iso_42001: [Clause-5.2, A.2.2, A.2.3]
+      nist_ai_rmf: [GOVERN-1.1, GOVERN-2.1]
+      iso_27001: [A.5.1]
+    evidence:
+      - source: governance-register
+        artifact: approved-ai-policy + system-owner-list
+        cadence: annual
+
+  - id: AIMS-DATA-1
+    title: Training Data Governance
+    statement: >
+      Data used to train or fine-tune AI systems is inventoried, lawfully
+      sourced, quality-assessed, and checked for representativeness and bias
+      before use, with provenance recorded.
+    ai_lifecycle_stage: [data, development]
+    maps_to:
+      iso_42001: [A.7.2, A.7.3, A.7.4]
+      nist_ai_rmf: [MAP-2.3, MEASURE-2.2]
+      iso_23894: [6.2]
+    evidence:
+      - source: data-management-record
+        artifact: dataset-inventory + provenance-log + bias-assessment
+        cadence: per-dataset + quarterly
+
+  - id: AIMS-RISK-1
+    title: AI Risk Assessment and Impact Analysis
+    statement: >
+      Each AI system undergoes a documented risk and impact assessment covering
+      affected individuals, potential harms, and likelihood, before deployment
+      and on significant change.
+    ai_lifecycle_stage: [development, validation, deployment]
+    maps_to:
+      iso_42001: [Clause-6.1, A.5.2, A.5.4]
+      nist_ai_rmf: [MAP-1.1, MEASURE-2.1, MANAGE-1.1]
+      iso_23894: [6.4, 6.5]
+    evidence:
+      - source: ai-risk-register
+        artifact: impact-assessment + risk-treatment-plan
+        cadence: per-system + on-change
+
+  - id: AIMS-VAL-1
+    title: Model Validation and Performance Testing
+    statement: >
+      AI systems are validated against defined performance, robustness, and
+      fairness criteria before release, with acceptance thresholds documented
+      and results retained.
+    ai_lifecycle_stage: [validation]
+    maps_to:
+      iso_42001: [A.6.2, A.8.2]
+      nist_ai_rmf: [MEASURE-2.3, MEASURE-2.5, MEASURE-2.11]
+      iso_23894: [6.5]
+    evidence:
+      - source: model-validation-record
+        artifact: test-results + acceptance-signoff
+        cadence: per-release
+
+  - id: AIMS-OVS-1
+    title: Human Oversight of AI Decisions
+    statement: >
+      AI systems affecting individuals provide meaningful human review of
+      consequential outputs, with documented authority to override or halt and
+      logging of override actions.
+    ai_lifecycle_stage: [deployment, operation]
+    maps_to:
+      iso_42001: [A.9.2, A.9.3]
+      nist_ai_rmf: [GOVERN-1.2, MANAGE-2.2]
+      iso_27001: [A.5.1]
+    evidence:
+      - source: model-deployment-record
+        artifact: oversight-design + override-log-sample
+        cadence: per-release + quarterly
+
+  - id: AIMS-TRANS-1
+    title: Transparency and System Documentation
+    statement: >
+      Documentation describing each AI system's purpose, capabilities,
+      limitations, and intended use is maintained and made available to
+      relevant interested parties, including affected users where appropriate.
+    ai_lifecycle_stage: [deployment, operation]
+    maps_to:
+      iso_42001: [A.8.3, A.8.4]
+      nist_ai_rmf: [GOVERN-4.2, MAP-3.4]
+      iso_23894: [6.3]
+    evidence:
+      - source: system-documentation
+        artifact: model-card + intended-use-statement
+        cadence: per-release
+
+  - id: AIMS-MON-1
+    title: Operational Monitoring and Drift Detection
+    statement: >
+      Deployed AI systems are monitored for performance degradation, data and
+      concept drift, and anomalous behaviour, with thresholds that trigger
+      review or rollback.
+    ai_lifecycle_stage: [operation]
+    maps_to:
+      iso_42001: [A.9.3, A.9.4]
+      nist_ai_rmf: [MANAGE-4.1, MEASURE-2.6]
+      iso_23894: [6.6]
+    evidence:
+      - source: monitoring-platform
+        artifact: drift-report + alert-disposition-log
+        cadence: continuous + monthly-review
+
+  - id: AIMS-INC-1
+    title: AI Incident Response and Reporting
+    statement: >
+      AI-related incidents (harmful outputs, security compromise of a model or
+      its data, serious malfunction) are detected, responded to, and recorded,
+      and feed corrective action back into the AIMS.
+    ai_lifecycle_stage: [operation, retirement]
+    maps_to:
+      iso_42001: [A.10.2, A.10.3]
+      nist_ai_rmf: [MANAGE-4.1, MANAGE-4.3]
+      iso_27001: [A.5.24, A.5.26]
+    evidence:
+      - source: incident-record
+        artifact: ai-incident-ticket + corrective-action
+        cadence: per-incident

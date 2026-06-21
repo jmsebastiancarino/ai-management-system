@@ -1,0 +1,17 @@
+name: validate-ai-controls
+on:
+  push:
+    paths: ["controls/**", "scripts/**", ".github/workflows/**"]
+  pull_request:
+    paths: ["controls/**", "scripts/**"]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Validate AI control catalog
+        run: python scripts/validate_ai_controls.py
